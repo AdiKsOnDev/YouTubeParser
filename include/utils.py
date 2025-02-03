@@ -1,4 +1,5 @@
 import json
+import csv
 import os
 from dotenv import load_dotenv
 
@@ -21,6 +22,7 @@ def save_to_json(data, filename):
     """
     os.makedirs("data", exist_ok=True)
     filepath = os.path.join("data", filename)
+
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
 
@@ -34,8 +36,13 @@ def save_to_csv(data, filename):
         data (dict): The dictionary to save.
         filename (str): The name of the CSV file to save the dictionary to.
     """
-    with open(filename, mode='w', newline='', encoding='utf-8') as file:
+    os.makedirs("data", exist_ok=True)
+    filepath = os.path.join("data", filename)
+
+    with open(filepath, mode='a', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         
-        writer.writerow(dictionary.keys())
-        writer.writerow(dictionary.values())
+        writer.writerow(data.keys())
+        writer.writerow(data.values())
+
+    print(f"Data saved to {filepath}")
