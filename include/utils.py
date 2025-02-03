@@ -1,3 +1,4 @@
+import logging
 import json
 import csv
 import os
@@ -26,7 +27,7 @@ def save_to_json(data, filename):
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
 
-    print(f"Data saved to {filepath}")
+    logging.info(f"Data saved to {filepath}")
 
 def save_to_csv(data, filename):
     """
@@ -45,4 +46,4 @@ def save_to_csv(data, filename):
         writer.writerow(data.keys())
         writer.writerow(data.values())
 
-    print(f"Data saved to {filepath}")
+    logging.info(f"Data added to {filepath}")

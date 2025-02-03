@@ -1,4 +1,6 @@
+import logging
 import googleapiclient.discovery
+
 from include.utils import load_api_key, save_to_json, save_to_csv
 from youtube_transcript_api import YouTubeTranscriptApi
 
@@ -14,14 +16,17 @@ def get_transcript(video_id):
     """
     try:
         transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        logging.debug(f"get_transcript() - Successfully retrieved Transcript for ID {video_id}")
+
         return " ".join([entry["text"] for entry in transcript])
     except Exception as e:
-        print(f"Error fetching transcript: {e}")
+        logging.error("An Error occured while getting the Transcript", exc_info=True)
 
         return None
 
 def get_youtube_service():
     api_key = load_api_key()
+    logging.debug("get_youtube_service() - Created the Google API object")
 
     return googleapiclient.discovery.build("youtube", "v3", developerKey=api_key)
 
@@ -45,6 +50,7 @@ def search_videos(query, max_results=10):
         type="video"
     )
     response = request.execute()
+    logging.debug("search_videos() - Got the list of videos")
 
     return response.get("items", [])
 
@@ -55,6 +61,8 @@ def get_video_details(video_id):
         id=video_id
     )
     response = request.execute()
+    logging.debug(f"get_video_details() - Got the details for ID {video_id}")
+
     return response.get("items", [])[0]
 
 def get_video_comments(video_id, max_results=100):
@@ -76,6 +84,7 @@ def get_video_comments(video_id, max_results=100):
         textFormat="plainText"
     )
     response = request.execute()
+    logging.debug(f"get_video_comments() - Got {max_results} for ID {video_id}")
 
     return response.get("items", [])
 
