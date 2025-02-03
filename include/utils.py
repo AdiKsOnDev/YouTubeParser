@@ -25,3 +25,17 @@ def save_to_json(data, filename):
         json.dump(data, f, indent=4)
 
     print(f"Data saved to {filepath}")
+
+def save_to_csv(data, filename):
+    """
+    Save a dictionary to a CSV file.
+
+    Args:
+        data (dict): The dictionary to save.
+        filename (str): The name of the CSV file to save the dictionary to.
+    """
+    with open(filename, mode='w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        
+        writer.writerow(dictionary.keys())
+        writer.writerow(dictionary.values())
