@@ -1,5 +1,5 @@
 import googleapiclient.discovery
-from include.utils import load_api_key, save_to_json
+from include.utils import load_api_key, save_to_json, save_to_csv
 from youtube_transcript_api import YouTubeTranscriptApi
 
 def get_transcript(video_id):
@@ -107,3 +107,6 @@ def fetch_video_data(query):
         results.append(video_data)
 
     save_to_json(results, f"{query}_data.json")
+
+    for result in results:
+        save_to_csv(result, f"{query}_data.csv")
