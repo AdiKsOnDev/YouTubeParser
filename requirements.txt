@@ -1,0 +1,6 @@
+google-api-python-client
+google-auth-oauthlib
+google-auth-httplib2
+pytube
+youtube-transcript-api
+python_dotenv
