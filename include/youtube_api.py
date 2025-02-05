@@ -99,21 +99,25 @@ def fetch_video_data(query):
         transcript = get_transcript(video_id)
         comments = get_video_comments(video_id)
 
-        video_data = {
-            "video_id": video_id,
-            "title": details["snippet"]["title"],
-            "views": details["statistics"]["viewCount"],
-            "likes": details["statistics"]["likeCount"],
-            "transcript": transcript,
-            "comments": [
-                {
-                    "text": comment["snippet"]["topLevelComment"]["snippet"]["textDisplay"],
-                    "likes": comment["snippet"]["topLevelComment"]["snippet"]["likeCount"]
-                }
-                for comment in comments
-            ]
-        }
-        results.append(video_data)
+        try:
+            video_data = {
+                "video_id": video_id,
+                "title": details["snippet"]["title"],
+                "views": details["statistics"]["viewCount"],
+                "likes": details["statistics"]["likeCount"],
+                "transcript": transcript,
+                "comments": [
+                    {
+                        "text": comment["snippet"]["topLevelComment"]["snippet"]["textDisplay"],
+                        "likes": comment["snippet"]["topLevelComment"]["snippet"]["likeCount"]
+                    }
+                    for comment in comments
+                ]
+            }
+            results.append(video_data)
+        except KeyError as e:
+            logging.warning("Like Count is Hidden", exc_info=True)
+            continue
 
     save_to_json(results, f"{query}_data.json")
 
