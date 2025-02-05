@@ -30,7 +30,7 @@ def get_youtube_service():
 
     return googleapiclient.discovery.build("youtube", "v3", developerKey=api_key)
 
-def search_videos(query, max_results=10):
+def search_videos(query, max_results=1000):
     """
     Queries YouTube using its API to find
     n number of videos resulting from a given query
@@ -65,7 +65,7 @@ def get_video_details(video_id):
 
     return response.get("items", [])[0]
 
-def get_video_comments(video_id, max_results=100):
+def get_video_comments(video_id, max_results=10):
     """
     Gets an n number of comments left under a given YouTube Video
 
