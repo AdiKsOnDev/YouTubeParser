@@ -65,7 +65,7 @@ def get_video_details(video_id):
 
     return response.get("items", [])[0]
 
-def get_video_comments(video_id, max_results=10):
+def get_video_comments(video_id, max_results=100):
     """
     Gets an n number of comments left under a given YouTube Video
 
@@ -76,17 +76,20 @@ def get_video_comments(video_id, max_results=10):
     Returns:
         List: Comments under a Video in a List format
     """
-    youtube = get_youtube_service()
-    request = youtube.commentThreads().list(
-        part="snippet",
-        videoId=video_id,
-        maxResults=max_results,
-        textFormat="plainText"
-    )
-    response = request.execute()
-    logging.debug(f"get_video_comments() - Got {max_results} for ID {video_id}")
+    try:
+        youtube = get_youtube_service()
+        request = youtube.commentThreads().list(
+            part="snippet",
+            videoId=video_id,
+            maxResults=max_results,
+            textFormat="plainText"
+        )
+        response = request.execute()
+        logging.debug(f"get_video_comments() - Got {max_results} for ID {video_id}")
 
-    return response.get("items", [])
+        return response.get("items", [])
+    except Exception as e:
+        return []
 
 def fetch_video_data(query):
     """Main Entry"""
@@ -100,20 +103,30 @@ def fetch_video_data(query):
         comments = get_video_comments(video_id)
 
         try:
-            video_data = {
-                "video_id": video_id,
-                "title": details["snippet"]["title"],
-                "views": details["statistics"]["viewCount"],
-                "likes": details["statistics"]["likeCount"],
-                "transcript": transcript,
-                "comments": [
-                    {
-                        "text": comment["snippet"]["topLevelComment"]["snippet"]["textDisplay"],
-                        "likes": comment["snippet"]["topLevelComment"]["snippet"]["likeCount"]
-                    }
-                    for comment in comments
-                ]
-            }
+            if comments != []:
+                video_data = {
+                    "video_id": video_id,
+                    "title": details["snippet"]["title"],
+                    "views": details["statistics"]["viewCount"],
+                    "likes": details["statistics"]["likeCount"],
+                    "transcript": transcript,
+                    "comments": [
+                        {
+                            "text": comment["snippet"]["topLevelComment"]["snippet"]["textDisplay"],
+                            "likes": comment["snippet"]["topLevelComment"]["snippet"]["likeCount"]
+                        }
+                        for comment in comments
+                    ]
+                }
+            else:
+                video_data = {
+                    "video_id": video_id,
+                    "title": details["snippet"]["title"],
+                    "views": details["statistics"]["viewCount"],
+                    "likes": details["statistics"]["likeCount"],
+                    "transcript": transcript,
+                }
+
             results.append(video_data)
         except KeyError as e:
             logging.warning("Like Count is Hidden", exc_info=True)
