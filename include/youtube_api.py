@@ -82,7 +82,8 @@ def get_video_comments(video_id, max_results=100):
             part="snippet",
             videoId=video_id,
             maxResults=max_results,
-            textFormat="plainText"
+            textFormat="plainText",
+            order="relevance"
         )
         response = request.execute()
         logging.debug(f"get_video_comments() - Got {max_results} for ID {video_id}")
