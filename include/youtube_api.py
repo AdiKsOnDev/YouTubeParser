@@ -131,7 +131,7 @@ def fetch_video_data(query):
 
             results.append(video_data)
         except KeyError as e:
-            logging.warning("Like Count is Hidden", exc_info=True)
+            logging.warning("Like Count is Hidden", exc_info=False)
             continue
 
     save_to_json(results, f"{query}_data.json")
