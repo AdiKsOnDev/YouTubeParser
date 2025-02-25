@@ -6,12 +6,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def load_api_key():
     api_key = os.getenv("YOUTUBE_API_KEY")
     if not api_key:
         raise ValueError("YouTube API key not found in .env file.")
 
     return api_key
+
 
 def save_to_json(data, filename):
     """
@@ -29,6 +31,7 @@ def save_to_json(data, filename):
 
     logging.info(f"Data saved to {filepath}")
 
+
 def save_to_csv(data, filename):
     """
     Save a dictionary to a CSV file.
@@ -40,10 +43,14 @@ def save_to_csv(data, filename):
     os.makedirs("data", exist_ok=True)
     filepath = os.path.join("data", filename)
 
+    file_exists = os.path.isfile(filepath) and os.path.getsize(filepath) > 0
+
     with open(filepath, mode='a', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
-        
-        writer.writerow(data.keys())
+
+        if not file_exists:
+            writer.writerow(data.keys())
+
         writer.writerow(data.values())
 
     logging.info(f"Data added to {filepath}")
