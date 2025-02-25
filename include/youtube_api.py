@@ -126,6 +126,7 @@ def fetch_video_data(query):
                     "views": details["statistics"]["viewCount"],
                     "likes": details["statistics"]["likeCount"],
                     "transcript": transcript,
+                    "comments": [],
                 }
 
             results.append(video_data)
