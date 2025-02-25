@@ -4,10 +4,11 @@ import googleapiclient.discovery
 from include.utils import load_api_key, save_to_json, save_to_csv
 from youtube_transcript_api import YouTubeTranscriptApi
 
+
 def get_transcript(video_id):
     """
     Extracts the transcript of a given youtube video
-    
+
     Args:
         video_id (str): ID of a YouTube Video
 
@@ -16,19 +17,23 @@ def get_transcript(video_id):
     """
     try:
         transcript = YouTubeTranscriptApi.get_transcript(video_id)
-        logging.debug(f"get_transcript() - Successfully retrieved Transcript for ID {video_id}")
+        logging.debug(
+            f"get_transcript() - Successfully retrieved Transcript for ID {video_id}")
 
         return " ".join([entry["text"] for entry in transcript])
     except Exception as e:
-        logging.error("An Error occured while getting the Transcript", exc_info=True)
+        logging.error(
+            "An Error occured while getting the Transcript", exc_info=True)
 
         return None
+
 
 def get_youtube_service():
     api_key = load_api_key()
     logging.debug("get_youtube_service() - Created the Google API object")
 
     return googleapiclient.discovery.build("youtube", "v3", developerKey=api_key)
+
 
 def search_videos(query, max_results=1000):
     """
@@ -54,6 +59,7 @@ def search_videos(query, max_results=1000):
 
     return response.get("items", [])
 
+
 def get_video_details(video_id):
     youtube = get_youtube_service()
     request = youtube.videos().list(
@@ -64,6 +70,7 @@ def get_video_details(video_id):
     logging.debug(f"get_video_details() - Got the details for ID {video_id}")
 
     return response.get("items", [])[0]
+
 
 def get_video_comments(video_id, max_results=100):
     """
@@ -86,16 +93,19 @@ def get_video_comments(video_id, max_results=100):
             order="relevance"
         )
         response = request.execute()
-        logging.debug(f"get_video_comments() - Got {max_results} for ID {video_id}")
+        logging.debug(
+            f"get_video_comments() - Got {max_results} for ID {video_id}")
 
         return response.get("items", [])
     except Exception as e:
         return []
 
+
 def fetch_video_data(query):
     """Main Entry"""
     videos = search_videos(query)
     results = []
+    results_comments = []
 
     for video in videos:
         video_id = video["id"]["videoId"]
@@ -119,6 +129,17 @@ def fetch_video_data(query):
                         for comment in comments
                     ]
                 }
+
+                comments_data = [{
+                    "text": comment["snippet"]["topLevelComment"]["snippet"]["textDisplay"],
+                    "likes": comment["snippet"]["topLevelComment"]["snippet"]["likeCount"],
+                    "parent_video_title": details["snippet"]["title"],
+                    "parent_video_id": video_id
+                    }    
+                for comment in comments]
+
+                for comment in comments_data:
+                    results_comments.append(comment)
             else:
                 video_data = {
                     "video_id": video_id,
@@ -130,11 +151,15 @@ def fetch_video_data(query):
                 }
 
             results.append(video_data)
-        except KeyError as e:
+        except KeyError:
             logging.warning("Like Count is Hidden", exc_info=False)
             continue
 
     save_to_json(results, f"{query}_data.json")
+    save_to_json(results_comments, f"{query}_comments_data.json")
 
     for result in results:
         save_to_csv(result, f"{query}_data.csv")
+
+    for result in results_comments:
+        save_to_csv(result, f"{query}_comments_data.csv")
